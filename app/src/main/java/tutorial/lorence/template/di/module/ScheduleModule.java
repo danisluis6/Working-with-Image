@@ -42,12 +42,6 @@ public class ScheduleModule {
         return new ScheduleAdapter(context, mFragment, new ArrayList<Schedule>());
     }
 
-    @Provides
-    @FragmentScope
-    ScheduleToDayAdapter provideScheduleToDayAdapter(Context context) {
-        return new ScheduleToDayAdapter(context, mFragment, new ArrayList<Schedule>());
-    }
-
     /**
      * Show up recyclerView adapter
      * @return FragmentTransaction

@@ -78,8 +78,8 @@ public class HomeModule {
 
     @Provides
     @ActivityScope
-    ViewPaperAdapter provideViewPagerAdapter(HomeActivity homeActivity, FragmentManager fragmentManager, FragmentSchedule fragmentSchedule) {
-        return new ViewPaperAdapter(homeActivity, fragmentManager, fragmentSchedule);
+    ViewPaperAdapter provideViewPagerAdapter(Context context, FragmentManager fragmentManager, FragmentSchedule fragmentSchedule) {
+        return new ViewPaperAdapter(context, fragmentManager, fragmentSchedule);
     }
 
     @Provides

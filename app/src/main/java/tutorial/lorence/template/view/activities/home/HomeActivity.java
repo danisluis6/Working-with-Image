@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -22,6 +23,7 @@ import tutorial.lorence.template.R;
 import tutorial.lorence.template.app.Application;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
 import tutorial.lorence.template.di.module.HomeModule;
+import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.service.JsonData;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
 import tutorial.lorence.template.view.activities.BaseActivity;
@@ -34,7 +36,7 @@ import tutorial.lorence.template.view.activities.home.adapter.ViewPaperAdapter;
  * @version 0.0.1
  */
 
-public class HomeActivity extends BaseActivity implements HomeView, MaterialTabListener {
+public class HomeActivity extends BaseActivity implements HomeView {
 
     @Inject
     Context mContext;
@@ -107,21 +109,34 @@ public class HomeActivity extends BaseActivity implements HomeView, MaterialTabL
 
         for (int index = 0; index < mPaperAdapter.getCount(); index++) {
             mTabHost.addTab(mTabHost.newTab()
-                    .setIcon(this.getResources()
-                            .getDrawable(getResId(index)))
-                    .setTabListener(this));
+                    .setText(getTabTitle(index))
+                    .setTabListener(new MaterialTabListener() {
+                        @Override
+                        public void onTabSelected(MaterialTab tab) {
+                            mTabHost.setSelectedNavigationItem(tab.getPosition());
+                        }
+
+                        @Override
+                        public void onTabReselected(MaterialTab tab) {
+                        }
+
+                        @Override
+                        public void onTabUnselected(MaterialTab tab) {
+
+                        }
+                    }));
         }
     }
 
-    private int getResId(int index) {
+    private String getTabTitle(int index) {
         if (index == 0) {
-            return R.drawable.ic_calendar;
+            return mContext.getResources().getString(R.string.tab_1);
         } else if (index == 1) {
-            return R.drawable.ic_result;
+            return mContext.getResources().getString(R.string.tab_2);
         } else if (index == 2) {
-            return R.drawable.ic_team;
+            return mContext.getResources().getString(R.string.tab_3);
         }
-        return 0;
+        return Constants.EMPTY_STRING;
     }
 
     @Override
@@ -144,17 +159,5 @@ public class HomeActivity extends BaseActivity implements HomeView, MaterialTabL
         if (mDisposable != null) {
             mDisposable.dispose();
         }
-    }
-
-    @Override
-    public void onTabSelected(MaterialTab tab) {
-    }
-
-    @Override
-    public void onTabReselected(MaterialTab tab) {
-    }
-
-    @Override
-    public void onTabUnselected(MaterialTab tab) {
     }
 }

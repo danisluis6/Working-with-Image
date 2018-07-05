@@ -52,9 +52,6 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView {
     ScheduleAdapter mScheduleAdapter;
 
     @Inject
-    ScheduleToDayAdapter mShScheduleToDayAdapter;
-
-    @Inject
     FragmentLoading mFragmentLoading;
 
     @Inject
@@ -71,10 +68,10 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView {
     private FragmentTransaction mFragmentTransaction;
     private Disposable mDisposable;
 
-    public void distributedDaggerComponents(HomeActivity homeActivity) {
+    public void distributedDaggerComponents() {
         Application.getInstance()
                 .getAppComponent()
-                .plus(new HomeModule(homeActivity))
+                .plus(new HomeModule((HomeActivity) getActivity()))
                 .plus(new ScheduleModule(this, this))
                 .inject(this);
     }
@@ -93,6 +90,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
+        distributedDaggerComponents();
         bindView(view);
         initComponents();
         mFragmentManager = this.getChildFragmentManager();
@@ -113,7 +111,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView {
 
     @Override
     public void onGetItemsSuccess(ArrayList<Schedule> items) {
-        if (this.getChildFragmentManager().getBackStackEntryCount() > 0) {
+        if (getChildFragmentManager().getBackStackEntryCount() > 0) {
             mFragmentManager.popBackStack();
         }
     }

@@ -15,8 +15,7 @@
         android:layout_height="48dp"
         android:layout_below="@+id/toolbar"
         app:primaryColor="@color/home_statusbar_color"
-        app:accentColor="#003575"
-        app:hasIcons="true" />
+        app:accentColor="#003575"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"

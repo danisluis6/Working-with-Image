@@ -1,10 +1,11 @@
 package tutorial.lorence.template.view.activities.home.adapter;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import tutorial.lorence.template.view.activities.home.HomeActivity;
+import tutorial.lorence.template.R;
 import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
 import tutorial.lorence.template.view.activities.home.loading.FragmentLoading;
 
@@ -18,22 +19,23 @@ import tutorial.lorence.template.view.activities.home.loading.FragmentLoading;
 public class ViewPaperAdapter extends FragmentStatePagerAdapter {
 
     private FragmentSchedule mFragmentSchedule;
+    private Context mContext;
 
-    public ViewPaperAdapter(HomeActivity homeActivity, FragmentManager fm, FragmentSchedule fragmentSchedule) {
+    public ViewPaperAdapter(Context context, FragmentManager fm, FragmentSchedule fragmentSchedule) {
         super(fm);
         mFragmentSchedule = fragmentSchedule;
-        mFragmentSchedule.distributedDaggerComponents(homeActivity);
+        mContext = context;
     }
 
     public Fragment getItem(int position) {
-        switch(position){
-            case 0:{
+        switch (position) {
+            case 0: {
                 return mFragmentSchedule;
             }
-            case 1:{
+            case 1: {
                 return new FragmentLoading();
             }
-            case 2:{
+            case 2: {
                 return new FragmentLoading();
             }
         }
@@ -49,11 +51,11 @@ public class ViewPaperAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "Football Schedule";
+                return mContext.getResources().getString(R.string.tab_1);
             case 1:
-                return "Result of Matches";
+                return mContext.getResources().getString(R.string.tab_2);
             case 2:
-                return "Teams";
+                return mContext.getResources().getString(R.string.tab_3);
             default:
                 return null;
         }
