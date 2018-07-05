@@ -7,4 +7,5 @@
     <string name="tab_1">Image Working</string>
     <string name="tab_2">Google Drive</string>
     <string name="tab_3">PDF Document</string>
+    <string name="todo">TODO</string>
 </resources>
