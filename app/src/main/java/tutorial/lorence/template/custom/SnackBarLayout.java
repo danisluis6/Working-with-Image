@@ -29,8 +29,6 @@ public class SnackBarLayout extends LinearLayout {
     LinearLayout lnStorage;
 
     public interface DialogInterface {
-        void openCamera();
-        void openGallery();
         void openStorage();
     }
 
@@ -47,16 +45,6 @@ public class SnackBarLayout extends LinearLayout {
 
     public void attachDialogInterface(DialogInterface _interface) {
         listener = _interface;
-    }
-
-    @OnClick(R.id.lnCamera)
-    public void OpenCamera() {
-        listener.openCamera();
-    }
-
-    @OnClick(R.id.lnGallery)
-    public void OpenGallery() {
-        listener.openGallery();
     }
 
     @OnClick(R.id.lnStorage)

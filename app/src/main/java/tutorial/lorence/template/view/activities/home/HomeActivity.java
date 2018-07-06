@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -24,7 +23,6 @@ import tutorial.lorence.template.app.Application;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
 import tutorial.lorence.template.di.module.HomeModule;
 import tutorial.lorence.template.other.Constants;
-import tutorial.lorence.template.other.Utils;
 import tutorial.lorence.template.service.JsonData;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
 import tutorial.lorence.template.view.activities.BaseActivity;
@@ -127,7 +125,6 @@ public class HomeActivity extends BaseActivity implements HomeView {
                         }
                     }));
         }
-        Utils.deleteImageFolder(this);
     }
 
     private String getTabTitle(int index) {

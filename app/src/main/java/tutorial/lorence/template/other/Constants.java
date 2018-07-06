@@ -19,8 +19,7 @@ public class Constants {
 
     public final static int PERMISSION_CAMERA = 0;
     public final static int PERMISSION_GALLERY = 1;
-    public final static int REQUEST_CAMERA = 3;
-    public final static int REQUEST_GALLERY = 4;
+    public final static int PERMISSION_STORAGE = 1;
 
     private Constants() {
     }
@@ -28,6 +27,4 @@ public class Constants {
     public enum MVP {
         _JSOUP, _JSON, _SQL
     }
-
-    static final String IMAGE_FOLDER = "Vogo";
 }
