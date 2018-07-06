@@ -194,6 +194,11 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
 
     @Override
     public void openGallery() {
+        if (Utils.checkPermissionReadExternalStorage(mHomeActivity)) {
+            takePhotoFromGallery();
+        } else {
+            Utils.settingPermissionReadExternalOnFragment(this);
+        }
     }
 
     @Override
@@ -212,6 +217,14 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
                 }
                 takePhotoByCamera();
                 break;
+            case Constants.PERMISSION_GALLERY:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    takePhotoFromGallery();
+                } else {
+                    Toast.makeText(mContext, getString(R.string.error_permission), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                break;
         }
     }
 
@@ -225,10 +238,23 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
                     Uri tempUri = Utils.getImageUri(mContext, bitmap);
                     if (tempUri != null) {
                         File newFile = new File(Utils.getRealPathFromURI(mHomeActivity, tempUri));
-                        Log.i("TAG", "File name: "+newFile.getName());
-                        Log.i("TAG", "File size: "+newFile.length());
                     } else {
                         Toast.makeText(mContext, getString(R.string.message_wrong_image), Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case Constants.REQUEST_GALLERY:
+                    if (data != null) {
+                        if (data.getData() != null) {
+                            final Uri uri = data.getData();
+                            try {
+                                final String path = Utils.getRealPathFromURI(mHomeActivity, uri);
+                                if (path != null) {
+                                    File newFile = new File(path);
+                                }
+                            } catch (Exception e) {
+                                Log.e("TAG", getResources().getString(R.string.error_selecting_file));
+                            }
+                        }
                     }
                     break;
             }
@@ -254,6 +280,12 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
         }
+    }
+
+    private void takePhotoFromGallery() {
+        if (mSnackbar.isShown()) mSnackbar.dismiss();
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto, Constants.REQUEST_GALLERY);
     }
 
     @Override
