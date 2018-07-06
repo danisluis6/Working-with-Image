@@ -4,6 +4,9 @@
     <string name="error_time_out">Connection to server timed out. Please try again later.</string>
     <string name="title_activity_splash">SplashActivity</string>
 
+    <string name="title_storage">Storage</string>
+    <string name="title_sub_storage">Root/</string>
+
     <string name="tab_1">Storage Android</string>
     <string name="tab_2">Google Drive</string>
     <string name="tab_3">PDF Document</string>

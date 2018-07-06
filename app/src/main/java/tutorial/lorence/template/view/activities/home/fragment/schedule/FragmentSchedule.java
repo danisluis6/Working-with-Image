@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -204,7 +203,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
         File[] files = root.listFiles();
         arrFolder.clear();
         for (File f : files) {
-            arrFolder.add(new Folder(R.drawable.ic_folder, f.getName(), (f.isDirectory()? "Directory": "File")));
+            arrFolder.add(new Folder(R.drawable.ic_folder, f.getName(), (f.isDirectory() ? "Directory" : "File"), f.getAbsolutePath()));
         }
         Intent intent = new Intent(mHomeActivity, StorageActivity.class);
         intent.putParcelableArrayListExtra("arrFolder", arrFolder);

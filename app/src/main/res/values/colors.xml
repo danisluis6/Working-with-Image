@@ -6,4 +6,6 @@
     <color name="black_overlay">#66000000</color>
 
     <color name="home_statusbar_color">#003b82</color>
+
+    <color name="colorWhite">#FFFFFF</color>
 </resources>

@@ -18,18 +18,22 @@ public class Folder implements Parcelable {
 
     private String type;
 
+    private String path;
+
     public Folder() {}
 
-    public Folder(int resId, String name, String type) {
+    public Folder(int resId, String name, String type, String path) {
         this.resId = resId;
         this.name = name;
         this.type = type;
+        this.path = path;
     }
 
     protected Folder(Parcel in) {
         resId = in.readInt();
         name = in.readString();
         type = in.readString();
+        path = in.readString();
     }
 
     public static final Creator<Folder> CREATOR = new Creator<Folder>() {
@@ -54,5 +58,42 @@ public class Folder implements Parcelable {
         parcel.writeInt(resId);
         parcel.writeString(name);
         parcel.writeString(type);
+        parcel.writeString(path);
+    }
+
+    public int getResId() {
+        return resId;
+    }
+
+    public void setResId(int resId) {
+        this.resId = resId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public static Creator<Folder> getCREATOR() {
+        return CREATOR;
     }
 }

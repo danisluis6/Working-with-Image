@@ -32,7 +32,7 @@
 
         </activity>
 
-        <activity android:name=".other.storage.StorageActivity"/>
+        <activity android:name=".other.storage.StorageActivity" />
     </application>
 
 </manifest>
