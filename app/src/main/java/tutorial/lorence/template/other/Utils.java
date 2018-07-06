@@ -338,4 +338,11 @@ public class Utils {
         return fileOrDirectory.delete();
     }
 
+    public static void settingPermissionReadExternalOnFragment(Fragment fragment) {
+        fragment.requestPermissions(
+                new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                }, Constants.PERMISSION_GALLERY
+        );
+    }
 }

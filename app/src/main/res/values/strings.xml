@@ -11,5 +11,6 @@
 
     <string name="fileprovider">.fileprovider</string>
     <string name="message_wrong_image">Something went wrong with the image, please try again!</string>
+    <string name="error_selecting_file">Error selecting file</string>
     <string name="error_permission">Permission is denied</string>
 </resources>

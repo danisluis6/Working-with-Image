@@ -18,7 +18,9 @@ public class Constants {
     static int DOUBLE_CLICK_TIME_DELTA = 500;
 
     public final static int PERMISSION_CAMERA = 0;
-    public final static int REQUEST_CAMERA = 1;
+    public final static int PERMISSION_GALLERY = 1;
+    public final static int REQUEST_CAMERA = 3;
+    public final static int REQUEST_GALLERY = 4;
 
     private Constants() {
     }
