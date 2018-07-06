@@ -1,37 +1,44 @@
 package tutorial.lorence.template.view.activities.home.fragment.schedule;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.BaseTransientBottomBar;
+import android.os.Handler;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
+import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
+import tutorial.lorence.template.BuildConfig;
 import tutorial.lorence.template.R;
 import tutorial.lorence.template.app.Application;
 import tutorial.lorence.template.custom.SnackBarLayout;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
 import tutorial.lorence.template.di.module.HomeModule;
 import tutorial.lorence.template.di.module.ScheduleModule;
+import tutorial.lorence.template.other.Constants;
+import tutorial.lorence.template.other.Utils;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 import tutorial.lorence.template.view.activities.home.fragment.adapter.ScheduleAdapter;
@@ -46,10 +53,7 @@ import tutorial.lorence.template.view.fragments.BaseFragment;
  */
 
 @SuppressLint("ValidFragment")
-public class FragmentSchedule extends BaseFragment implements ScheduleView {
-
-    @BindView(R.id.test)
-    Button test;
+public class FragmentSchedule extends BaseFragment implements ScheduleView, SnackBarLayout.DialogInterface, HomeActivity.HomeInterface {
 
     @Inject
     Context mContext;
@@ -81,6 +85,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView {
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private Disposable mDisposable;
+    private String mCurrentPhotoPath;
 
     public void distributedDaggerComponents() {
         Application.getInstance()
@@ -107,30 +112,42 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView {
         distributedDaggerComponents();
         bindView(view);
         initComponents();
+        showDialogProgress();
+        return view;
+    }
+
+    private void showDialogProgress() {
+        mSchedulePresenter.getItems();
         mFragmentManager = this.getChildFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.add(R.id.fragment_container, mFragmentLoading);
         mFragmentTransaction.addToBackStack(null);
         mFragmentTransaction.commit();
-        mSchedulePresenter.getItems();
-        return view;
     }
 
     @Override
     public void initComponents() {
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSnackbar.show();
-            }
-        });
+        mSnackBarLayout.attachDialogInterface(this);
+        mHomeActivity.attachHomeInterface(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onGetItemsSuccess(ArrayList<Schedule> items) {
-        if (getChildFragmentManager().getBackStackEntryCount() > 0) {
-            mFragmentManager.popBackStack();
+        if (isStateSaved()) {
+            return;
         }
+        new Handler().post(new Runnable() {
+            public void run() {
+                if (getChildFragmentManager().getBackStackEntryCount() > 0) {
+                    mFragmentManager.popBackStack();
+                }
+            }
+        });
     }
 
     @Override
@@ -161,5 +178,85 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView {
         if (mDisposable != null) {
             mDisposable.dispose();
         }
+    }
+
+    @Override
+    public void openCamera() {
+        if (Utils.isDoubleClick()) {
+            return;
+        }
+        if (Utils.checkPermissionCamera(mHomeActivity)) {
+            takePhotoByCamera();
+        } else {
+            Utils.settingPermissionCameraOnFragment(this);
+        }
+    }
+
+    @Override
+    public void openGallery() {
+    }
+
+    @Override
+    public void openStorage() {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case Constants.PERMISSION_CAMERA:
+                for (int permissionId : grantResults) {
+                    if (permissionId != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(mContext, getString(R.string.error_permission), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                takePhotoByCamera();
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case Constants.REQUEST_CAMERA:
+                    Bitmap bitmap = Utils.fixOrientationBugOfProcessedBitmap(mContext,
+                            BitmapFactory.decodeFile(mCurrentPhotoPath), mCurrentPhotoPath);
+                    Uri tempUri = Utils.getImageUri(mContext, bitmap);
+                    if (tempUri != null) {
+                        File newFile = new File(Utils.getRealPathFromURI(mHomeActivity, tempUri));
+                        Log.i("TAG", "File name: "+newFile.getName());
+                        Log.i("TAG", "File size: "+newFile.length());
+                    } else {
+                        Toast.makeText(mContext, getString(R.string.message_wrong_image), Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void takePhotoByCamera() {
+        if (mSnackbar.isShown()) mSnackbar.dismiss();
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = null;
+        try {
+            photoFile = Utils.createImageFile();
+            mCurrentPhotoPath = photoFile.getAbsolutePath();
+        } catch (IOException ex) {
+            // Error occurred while creating the File
+        }
+        // Continue only if the File was successfully created
+        if (photoFile != null) {
+            Uri photoURI = FileProvider.getUriForFile(mContext,
+                    BuildConfig.APPLICATION_ID + getString(R.string.fileprovider),
+                    photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
+        }
+    }
+
+    @Override
+    public void onBackPressOnFragment() {
     }
 }

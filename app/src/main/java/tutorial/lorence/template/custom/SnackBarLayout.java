@@ -28,6 +28,14 @@ public class SnackBarLayout extends LinearLayout {
     @BindView(R.id.lnStorage)
     LinearLayout lnStorage;
 
+    public interface DialogInterface {
+        void openCamera();
+        void openGallery();
+        void openStorage();
+    }
+
+    private static DialogInterface listener;
+
     public SnackBarLayout(Context context) {
         super(context);
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -37,20 +45,23 @@ public class SnackBarLayout extends LinearLayout {
         ButterKnife.bind(this, view);
     }
 
+    public void attachDialogInterface(DialogInterface _interface) {
+        listener = _interface;
+    }
+
     @OnClick(R.id.lnCamera)
     public void OpenCamera() {
+        listener.openCamera();
     }
 
     @OnClick(R.id.lnGallery)
     public void OpenGallery() {
+        listener.openGallery();
     }
 
     @OnClick(R.id.lnStorage)
     public void AccessStorage() {
+        listener.openStorage();
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
 }

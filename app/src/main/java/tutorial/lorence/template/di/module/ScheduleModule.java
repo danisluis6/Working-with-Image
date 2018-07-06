@@ -78,7 +78,7 @@ public class ScheduleModule {
 
     @Provides
     @FragmentScope
-    Snackbar provideSnackbar(Context context, SnackBarLayout snackBarLayout) {
+    Snackbar provideSnackbar(SnackBarLayout snackBarLayout) {
         View parentLayout = mActivity.getWindow().getDecorView().findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(parentLayout, "File Choosers", Snackbar.LENGTH_LONG);
         final Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
@@ -91,7 +91,6 @@ public class ScheduleModule {
         if(snackBarLayout.getParent() != null)
             ((ViewGroup)snackBarLayout.getParent()).removeView(snackBarLayout);
         layout.addView(snackBarLayout);
-        layout.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
         snackbar.setDuration(BaseTransientBottomBar.LENGTH_INDEFINITE);
         return snackbar;
     }

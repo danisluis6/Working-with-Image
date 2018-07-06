@@ -24,6 +24,7 @@ import tutorial.lorence.template.app.Application;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
 import tutorial.lorence.template.di.module.HomeModule;
 import tutorial.lorence.template.other.Constants;
+import tutorial.lorence.template.other.Utils;
 import tutorial.lorence.template.service.JsonData;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
 import tutorial.lorence.template.view.activities.BaseActivity;
@@ -126,6 +127,7 @@ public class HomeActivity extends BaseActivity implements HomeView {
                         }
                     }));
         }
+        Utils.deleteImageFolder(this);
     }
 
     private String getTabTitle(int index) {
@@ -159,5 +161,21 @@ public class HomeActivity extends BaseActivity implements HomeView {
         if (mDisposable != null) {
             mDisposable.dispose();
         }
+    }
+
+    public interface HomeInterface {
+        void onBackPressOnFragment();
+    }
+
+    private static HomeInterface listener;
+
+    public void attachHomeInterface(HomeInterface _interface) {
+        listener = _interface;
+    }
+
+    @Override
+    public void onBackPressed() {
+        listener.onBackPressOnFragment();
+        super.onBackPressed();
     }
 }
