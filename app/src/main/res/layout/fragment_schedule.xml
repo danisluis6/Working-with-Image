@@ -30,5 +30,11 @@
             android:background="#fff"
             android:textColor="#000"
             android:typeface="monospace" />
+
+        <tutorial.lorence.template.custom.EzFaxingLayout
+            android:id="@+id/layoutRetry"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
     </FrameLayout>
 </FrameLayout>

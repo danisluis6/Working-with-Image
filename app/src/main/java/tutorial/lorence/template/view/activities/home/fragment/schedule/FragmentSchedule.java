@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -39,6 +39,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 import tutorial.lorence.template.R;
 import tutorial.lorence.template.app.Application;
+import tutorial.lorence.template.custom.EzFaxingLayout;
 import tutorial.lorence.template.custom.SnackBarLayout;
 import tutorial.lorence.template.custom.pdfviewer.PDFView;
 import tutorial.lorence.template.custom.pdfviewer.listener.OnDrawListener;
@@ -104,6 +105,9 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
 
     @BindView(R.id.faxViewerLayout)
     FrameLayout faxViewerLayout;
+
+    @BindView(R.id.layoutRetry)
+    EzFaxingLayout layoutRetry;
 
     private int mCurrentPage = 1;
     private int mPageCount = 0;
@@ -260,6 +264,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
 //                    Intent _viewIntent = new Intent(mHomeActivity, ViewActivity.class);
 //                    _viewIntent.putExtra("Path", mCurrentPath);
 //                    startActivity(_viewIntent);
+                    handleMessage(null, null);
                     Completable.fromAction(new Action() {
                         @Override
                         public void run() throws Exception {
@@ -333,7 +338,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
                 .onError(new OnErrorListener() {
                     @Override
                     public void onError(Throwable t) {
-                        // TODO
+                        handleMessage("Hello", "File is not valid");
                     }
                 }).load();
     }
@@ -350,5 +355,24 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
             tvPdfPaging.setText(getString(R.string.pageCount, page, pageCount));
         }
         mCurrentPage = page;
+    }
+
+    private void handleMessage(String _case, String message) {
+        if (TextUtils.isEmpty(_case) || TextUtils.isEmpty(message)) {
+            faxViewerLayout.setVisibility(View.VISIBLE);
+            layoutRetry.setVisibility(View.GONE);
+            return;
+        }
+        layoutRetry.setVisibility(View.VISIBLE);
+        layoutRetry.setupMessageDisplay(message);
+        layoutRetry.setListenerRetry(new EzFaxingLayout.OnRetryListener() {
+            @Override
+            public void onRetry() {
+                if (mSnackbar.isShown())
+                    mSnackbar.dismiss();
+                else
+                    mSnackbar.show();
+            }
+        });
     }
 }
