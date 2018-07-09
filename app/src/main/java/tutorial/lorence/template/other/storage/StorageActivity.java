@@ -106,6 +106,7 @@ public class StorageActivity extends BaseActivity implements SwipeRefreshLayout.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.ic_exit:
+                finish();
                 return true;
             case android.R.id.home:
                 onBackPressed();
@@ -129,7 +130,10 @@ public class StorageActivity extends BaseActivity implements SwipeRefreshLayout.
             hierarchyFolder.put(String.valueOf(mIndex), temps);
             mStorageAdapter.updateFolder(temps);
         } else {
-            Toast.makeText(mContext, "This is file", Toast.LENGTH_SHORT).show();
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("Path", folder.getPath());
+            setResult(RESULT_OK, returnIntent);
+            finish();
         }
     }
 

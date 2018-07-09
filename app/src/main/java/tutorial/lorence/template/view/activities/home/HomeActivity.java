@@ -1,6 +1,8 @@
 package tutorial.lorence.template.view.activities.home;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -150,6 +153,19 @@ public class HomeActivity extends BaseActivity implements HomeView {
     @Override
     public void onGetItemsFailure(String message) {
 
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case Constants.REQUEST_STORAGE:
+                    String mCurrentPath = data.getStringExtra("Path");
+                    Toast.makeText(mContext, mCurrentPath, Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

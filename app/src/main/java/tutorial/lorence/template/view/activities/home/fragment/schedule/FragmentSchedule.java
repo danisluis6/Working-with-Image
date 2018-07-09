@@ -1,9 +1,13 @@
 package tutorial.lorence.template.view.activities.home.fragment.schedule;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -11,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -207,7 +212,9 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
         }
         Intent intent = new Intent(mHomeActivity, StorageActivity.class);
         intent.putParcelableArrayListExtra("arrFolder", arrFolder);
-        mHomeActivity.startActivityForResult(intent, 0);
+        mHomeActivity.startActivityForResult(intent, Constants.REQUEST_STORAGE);
+        if (mSnackbar.isShown())
+            mSnackbar.dismiss();
     }
 
     @Override

@@ -21,6 +21,8 @@ public class Constants {
     public final static int PERMISSION_GALLERY = 1;
     public final static int PERMISSION_STORAGE = 1;
 
+    public final static int REQUEST_STORAGE = 0;
+
     private Constants() {
     }
 
