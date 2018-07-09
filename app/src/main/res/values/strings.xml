@@ -13,4 +13,7 @@
     <string name="message_wrong_image">Something went wrong with the image, please try again!</string>
     <string name="error_permission">Permission is denied</string>
     <string name="dialog_pick">Effort Improve Android Skill</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_retry">Retry</string>
 </resources>

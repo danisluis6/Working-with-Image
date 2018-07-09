@@ -29,8 +29,9 @@
             android:name="tutorial.lorence.template.view.activities.splash.SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/FullscreenTheme">
-
         </activity>
+
+        <activity android:name=".view.activities.crop.CropImageActivity"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

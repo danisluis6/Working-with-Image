@@ -20,6 +20,8 @@ public class Constants {
     public final static int PERMISSION_CAMERA = 0;
     public final static int REQUEST_CAMERA = 1;
 
+    public final static int REQUEST_IMAGE_CROP = 2;
+
     private Constants() {
     }
 

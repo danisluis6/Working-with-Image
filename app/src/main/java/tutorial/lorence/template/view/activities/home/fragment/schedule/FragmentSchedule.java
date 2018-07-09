@@ -29,7 +29,12 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import butterknife.OnClick;
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
 import tutorial.lorence.template.BuildConfig;
 import tutorial.lorence.template.R;
 import tutorial.lorence.template.app.Application;
@@ -40,6 +45,7 @@ import tutorial.lorence.template.di.module.ScheduleModule;
 import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.other.Utils;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
+import tutorial.lorence.template.view.activities.crop.CropImageActivity;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 import tutorial.lorence.template.view.activities.home.fragment.adapter.ScheduleAdapter;
 import tutorial.lorence.template.view.activities.home.loading.FragmentLoading;
@@ -91,7 +97,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
         Application.getInstance()
                 .getAppComponent()
                 .plus(new HomeModule((HomeActivity) getActivity()))
-                .plus(new ScheduleModule((HomeActivity) getActivity() ,this, this))
+                .plus(new ScheduleModule((HomeActivity) getActivity(), this, this))
                 .inject(this);
     }
 
@@ -128,7 +134,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     @Override
     public void initComponents() {
         mSnackBarLayout.attachDialogInterface(this);
-        mSnackBarLayout.setPadding(0,0,0,0);
+        mSnackBarLayout.setPadding(0, 0, 0, 0);
         mHomeActivity.attachHomeInterface(this);
     }
 
@@ -162,7 +168,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     }
 
     @OnClick({R.id.fragment_container})
-    void onClick (View v) {
+    void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_container:
                 if (mSnackbar.isShown())
@@ -226,38 +232,71 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
                     Uri tempUri = Utils.getImageUri(mContext, bitmap);
                     if (tempUri != null) {
                         File newFile = new File(Utils.getRealPathFromURI(mHomeActivity, tempUri));
-                        Log.i("TAG", "File name: "+newFile.getName());
-                        Log.i("TAG", "File size: "+newFile.length());
+                        executeCroppedImage(mCurrentPhotoPath);
                     } else {
                         Toast.makeText(mContext, getString(R.string.message_wrong_image), Toast.LENGTH_SHORT).show();
                     }
+                    break;
+                case Constants.REQUEST_IMAGE_CROP:
+//                    Bitmap _bitmap = data.getParcelableExtra("Path");
+//                    setImageProfile(_bitmap);
+//                    if (_bitmap.getByteCount() <= 1920) {
+//                        setImageProfile(_bitmap);
+//                    } else {
+//                        new ExecuteSetProfileImgAsyncTask().execute(bitmap);
+//                    }
                     break;
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void executeCroppedImage(final String currentPhotoPath) {
+        Intent intent = new Intent(mHomeActivity, CropImageActivity.class);
+        intent.putExtra("Path", currentPhotoPath);
+        startActivityForResult(intent, Constants.REQUEST_IMAGE_CROP);
+    }
+
     private void takePhotoByCamera() {
         if (mSnackbar.isShown()) mSnackbar.dismiss();
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photoFile = null;
-        try {
-            photoFile = Utils.createImageFile();
-            mCurrentPhotoPath = photoFile.getAbsolutePath();
-        } catch (IOException ex) {
-            // Error occurred while creating the File
-        }
-        // Continue only if the File was successfully created
-        if (photoFile != null) {
-            Uri photoURI = FileProvider.getUriForFile(mContext,
-                    BuildConfig.APPLICATION_ID + getString(R.string.fileprovider),
-                    photoFile);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-            startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
-        }
+                Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                File photoFile = null;
+                try {
+                    photoFile = Utils.createImageFile();
+                    mCurrentPhotoPath = photoFile.getAbsolutePath();
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                }
+                // Continue only if the File was successfully created
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(mContext,
+                            BuildConfig.APPLICATION_ID + getString(R.string.fileprovider),
+                            photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+            @Override
+            public void onSubscribe(Disposable d) {
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+        });
     }
 
     @Override
     public void onBackPressOnFragment() {
     }
+
 }
