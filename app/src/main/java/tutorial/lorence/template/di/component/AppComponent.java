@@ -10,6 +10,7 @@ import tutorial.lorence.template.di.module.HomeModule;
 import tutorial.lorence.template.di.module.JsoupModule;
 import tutorial.lorence.template.di.module.LoadingModule;
 import tutorial.lorence.template.di.module.StorageModule;
+import tutorial.lorence.template.di.module.ViewModule;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -26,5 +27,6 @@ import tutorial.lorence.template.di.module.StorageModule;
 )
 public interface AppComponent {
     HomeComponent plus(HomeModule module);
+    ViewComponent plus(ViewModule module);
     StorageComponent plus(StorageModule module);
 }

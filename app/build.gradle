@@ -65,12 +65,13 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:2.1.13"
     compile "io.reactivex.rxjava2:rxandroid:2.0.2"
 
-    // Jsoup
-    compile 'org.jsoup:jsoup:1.11.2'
-
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 
     compile 'it.neokree:MaterialTabs:0.11'
+    
+    // PDF
+    compile 'com.github.barteksc:android-pdf-viewer:2.7.0'
+    implementation files('libs/pdfbox-2.0.0.jar')
 }
