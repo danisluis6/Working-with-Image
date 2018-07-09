@@ -95,7 +95,6 @@ public class ViewActivity extends BaseActivity implements OnPageChangeListener, 
 
             @Override
             public void onError(Throwable e) {
-
             }
         });
         initPDFEvent();
