@@ -128,6 +128,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     @Override
     public void initComponents() {
         mSnackBarLayout.attachDialogInterface(this);
+        mSnackBarLayout.setPadding(0,0,0,0);
         mHomeActivity.attachHomeInterface(this);
     }
 
