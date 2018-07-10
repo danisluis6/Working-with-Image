@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -29,7 +28,7 @@ import tutorial.lorence.template.other.Utils;
 import tutorial.lorence.template.service.JsonData;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
 import tutorial.lorence.template.view.activities.BaseActivity;
-import tutorial.lorence.template.view.activities.home.adapter.ViewPaperAdapter;
+import tutorial.lorence.template.view.activities.home.adapter.PaperAdapter;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -56,7 +55,7 @@ public class HomeActivity extends BaseActivity implements HomeView {
     DownloadImage mDownloadImage;
 
     @Inject
-    ViewPaperAdapter mPaperAdapter;
+    PaperAdapter mPaperAdapter;
 
 
     @BindView(R.id.pager)
@@ -80,7 +79,7 @@ public class HomeActivity extends BaseActivity implements HomeView {
 
     @Override
     protected int getLayoutRes() {
-        return R.layout.activity_main;
+        return R.layout.activity_home;
     }
 
     @Override

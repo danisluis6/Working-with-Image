@@ -3,7 +3,7 @@ package tutorial.lorence.template.di.component;
 import dagger.Subcomponent;
 import tutorial.lorence.template.di.module.ScheduleModule;
 import tutorial.lorence.template.di.scope.FragmentScope;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
+import tutorial.lorence.template.view.activities.home.fragment.content.FragmentContent;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -20,7 +20,7 @@ import tutorial.lorence.template.view.activities.home.fragment.schedule.Fragment
         }
 )
 public interface FragmentComponent {
-    FragmentSchedule inject(FragmentSchedule fragmentSchedule);
+    FragmentContent inject(FragmentContent fragmentContent);
 }
 
 

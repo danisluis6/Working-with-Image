@@ -11,7 +11,7 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
 import tutorial.lorence.template.view.activities.home.HomeModelImpl;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.ScheduleModelImpl;
+import tutorial.lorence.template.view.activities.home.fragment.content.ContentModelImpl;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -33,7 +33,7 @@ public class DisposableManager {
         this.listener = disposableInterface;
     }
 
-    public void setInterfaceOnSchedule(ScheduleModelImpl disposableInterface) {
+    public void setInterfaceOnSchedule(ContentModelImpl disposableInterface) {
         this.listener = disposableInterface;
     }
 

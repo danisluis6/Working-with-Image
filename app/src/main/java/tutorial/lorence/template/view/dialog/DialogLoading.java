@@ -6,7 +6,7 @@ import android.view.Window;
 
 import tutorial.lorence.template.R;
 
-public class VGLoadingDialog extends Dialog {
+public class DialogLoading extends Dialog {
     /**
      * Activity
      */
@@ -17,7 +17,7 @@ public class VGLoadingDialog extends Dialog {
      *
      * @param activity activity
      */
-    public VGLoadingDialog(Activity activity) {
+    public DialogLoading(Activity activity) {
         super(activity);
         this.mActivity = activity;
         init();

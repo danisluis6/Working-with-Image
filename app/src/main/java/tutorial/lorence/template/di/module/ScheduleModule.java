@@ -22,11 +22,11 @@ import tutorial.lorence.template.di.scope.FragmentScope;
 import tutorial.lorence.template.service.DisposableManager;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 import tutorial.lorence.template.view.activities.home.fragment.adapter.ScheduleAdapter;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.ScheduleModel;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.SchedulePresenter;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.SchedulePresenterImpl;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.ScheduleView;
+import tutorial.lorence.template.view.activities.home.fragment.content.ContentPresenterImpl;
+import tutorial.lorence.template.view.activities.home.fragment.content.FragmentContent;
+import tutorial.lorence.template.view.activities.home.fragment.content.ContentModel;
+import tutorial.lorence.template.view.activities.home.fragment.content.ContentPresenter;
+import tutorial.lorence.template.view.activities.home.fragment.content.ContentView;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -38,12 +38,12 @@ import tutorial.lorence.template.view.activities.home.fragment.schedule.Schedule
 @Module
 public class ScheduleModule {
 
-    private FragmentSchedule mFragment;
+    private FragmentContent mFragment;
     private HomeActivity mActivity;
-    private ScheduleView mView;
+    private ContentView mView;
 
-    public ScheduleModule(HomeActivity homeActivity, FragmentSchedule fragmentSchedule, ScheduleView view) {
-        mFragment = fragmentSchedule;
+    public ScheduleModule(HomeActivity homeActivity, FragmentContent fragmentContent, ContentView view) {
+        mFragment = fragmentContent;
         mActivity = homeActivity;
         mView = view;
     }
@@ -66,8 +66,8 @@ public class ScheduleModule {
 
     @Provides
     @FragmentScope
-    SchedulePresenter provideSchedulePresenter(Context context, HomeActivity homeActivity, FragmentSchedule fragment, ScheduleModel scheduleModel, DisposableManager disposableManager) {
-        return new SchedulePresenterImpl(context, homeActivity, fragment, mView, scheduleModel, disposableManager);
+    ContentPresenter provideSchedulePresenter(Context context, HomeActivity homeActivity, FragmentContent fragment, ContentModel contentModel, DisposableManager disposableManager) {
+        return new ContentPresenterImpl(context, homeActivity, fragment, mView, contentModel, disposableManager);
     }
 
     @Provides

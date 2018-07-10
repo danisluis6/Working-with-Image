@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import tutorial.lorence.template.R;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
+import tutorial.lorence.template.view.activities.home.fragment.content.FragmentContent;
 import tutorial.lorence.template.view.activities.home.loading.FragmentLoading;
 
 /**
@@ -16,21 +16,21 @@ import tutorial.lorence.template.view.activities.home.loading.FragmentLoading;
  * @version 0.0.1
  */
 
-public class ViewPaperAdapter extends FragmentStatePagerAdapter {
+public class PaperAdapter extends FragmentStatePagerAdapter {
 
-    private FragmentSchedule mFragmentSchedule;
+    private FragmentContent mFragmentContent;
     private Context mContext;
 
-    public ViewPaperAdapter(Context context, FragmentManager fm, FragmentSchedule fragmentSchedule) {
+    public PaperAdapter(Context context, FragmentManager fm, FragmentContent fragmentContent) {
         super(fm);
-        mFragmentSchedule = fragmentSchedule;
+        mFragmentContent = fragmentContent;
         mContext = context;
     }
 
     public Fragment getItem(int position) {
         switch (position) {
             case 0: {
-                return mFragmentSchedule;
+                return mFragmentContent;
             }
             case 1: {
                 return new FragmentLoading();

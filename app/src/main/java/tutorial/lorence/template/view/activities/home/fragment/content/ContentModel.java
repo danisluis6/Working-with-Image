@@ -1,4 +1,4 @@
-package tutorial.lorence.template.view.activities.home.fragment.schedule;
+package tutorial.lorence.template.view.activities.home.fragment.content;
 
 import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.service.DisposableManager;
@@ -11,10 +11,10 @@ import tutorial.lorence.template.view.activities.home.HomeActivity;
  * @version 0.0.1
  */
 
-public interface ScheduleModel {
+public interface ContentModel {
     void getItems(Constants.MVP mvp);
-    void attachPresenter(SchedulePresenter presenter);
+    void attachPresenter(ContentPresenter presenter);
     void attachDisposable(DisposableManager disposableManager);
-    void attachFragment(FragmentSchedule fragmentSchedule);
+    void attachFragment(FragmentContent fragmentContent);
     void attachActivity(HomeActivity mHomeActivity);
 }

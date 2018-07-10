@@ -4,34 +4,24 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.text.TextUtils;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
-import tutorial.lorence.template.view.activities.crop.Dimension;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -59,13 +49,6 @@ public class Utils {
         }
         sLastClickTime = clickTime;
         return false;
-    }
-
-    public static RoundedBitmapDrawable setRoundedBitmapImg(Bitmap bitmap, Context context) {
-        RoundedBitmapDrawable drawable = RoundedBitmapDrawableFactory.create(context.getResources(),
-                Bitmap.createScaledBitmap(bitmap, Dimension.convertDptoPx(150, context), Dimension.convertDptoPx(150, context), false));
-        drawable.setCircular(true);
-        return drawable;
     }
 
     public static boolean isInternetOn(Context context) {
@@ -226,14 +209,6 @@ public class Utils {
                 && ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static void settingPermissionCameraOnActivity(Activity activity) {
-        ActivityCompat.requestPermissions(activity,
-                new String[]{
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, Constants.PERMISSION_CAMERA
-        );
-    }
 
     public static void settingPermissionCameraOnFragment(Fragment fragment) {
         fragment.requestPermissions(
@@ -241,19 +216,6 @@ public class Utils {
                         Manifest.permission.CAMERA,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                 }, Constants.PERMISSION_CAMERA
-        );
-    }
-
-    public static File createImageFile() throws IOException {
-        // Create an image file name
-        String imageFileName = String.format(Locale.US, "Vg_%d", System.currentTimeMillis());
-        File storageDir = getAlbumStorageDir(Constants.IMAGE_FOLDER);
-
-        // Save a file: path for use with ACTION_VIEW intents
-        return File.createTempFile(
-                imageFileName,        /* prefix    */
-                ".jpg",         /* suffix    */
-                storageDir            /* directory  */
         );
     }
 
@@ -309,33 +271,11 @@ public class Utils {
         return rotate;
     }
 
-    public static Uri getImageUri(Context inContext, Bitmap inImage) {
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Vogo_", null);
-        if (TextUtils.isEmpty(path)) {
-            return null;
-        }
-        return Uri.parse(path);
-    }
-
-    public static String getRealPathFromURI(Activity activity, Uri contentUri) {
-        String res = null;
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = activity.getContentResolver().query(contentUri, projection, null, null, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                res = cursor.getString(column_index);
-            }
-            cursor.close();
-        }
-        return res;
-    }
-
     public static boolean deleteImageFolder(Activity activity) {
         return !Utils.checkPermissionReadExternalStorage(activity) && deleteRecursive(getAlbumStorageDir(Constants.IMAGE_FOLDER));
     }
 
-    public static boolean checkPermissionReadExternalStorage(Activity activity) {
+    static boolean checkPermissionReadExternalStorage(Activity activity) {
         return ActivityCompat.checkSelfPermission(activity,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
     }
@@ -348,18 +288,4 @@ public class Utils {
         }
         return fileOrDirectory.delete();
     }
-
-    public static Bitmap resizeAndCompressImage(Bitmap bmpPic) {
-        int compressQuality = 100; // quality decreasing by 5 every loop.
-        int streamLength;
-        do {
-            ByteArrayOutputStream bmpStream = new ByteArrayOutputStream();
-            bmpPic.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream);
-            byte[] bmpPicByteArray = bmpStream.toByteArray();
-            streamLength = bmpPicByteArray.length;
-            compressQuality -= 5;
-        } while (streamLength >= 20*1024);
-        return bmpPic;
-    }
-
 }

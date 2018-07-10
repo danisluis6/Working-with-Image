@@ -1,4 +1,4 @@
-package tutorial.lorence.template.view.activities.home.fragment.schedule;
+package tutorial.lorence.template.view.activities.home.fragment.content;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ import tutorial.lorence.template.data.storage.database.entities.Schedule;
  * @version 0.0.1
  */
 
-public interface ScheduleView {
+public interface ContentView {
     void initComponents();
     void onGetItemsSuccess(ArrayList<Schedule> items);
     void onGetItemsFailure(String message);

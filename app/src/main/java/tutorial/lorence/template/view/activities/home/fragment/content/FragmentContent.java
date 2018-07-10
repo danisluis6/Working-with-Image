@@ -1,43 +1,26 @@
-package tutorial.lorence.template.view.activities.home.fragment.schedule;
+package tutorial.lorence.template.view.activities.home.fragment.content;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
 import butterknife.OnClick;
-import io.reactivex.Completable;
-import io.reactivex.CompletableObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.schedulers.Schedulers;
-import tutorial.lorence.template.BuildConfig;
 import tutorial.lorence.template.R;
 import tutorial.lorence.template.app.Application;
 import tutorial.lorence.template.custom.SnackBarLayout;
@@ -47,11 +30,10 @@ import tutorial.lorence.template.di.module.ScheduleModule;
 import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.other.Utils;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
-import tutorial.lorence.template.view.activities.crop.CropImageActivity;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 import tutorial.lorence.template.view.activities.home.fragment.adapter.ScheduleAdapter;
 import tutorial.lorence.template.view.activities.home.loading.FragmentLoading;
-import tutorial.lorence.template.view.dialog.VGLoadingDialog;
+import tutorial.lorence.template.view.dialog.DialogLoading;
 import tutorial.lorence.template.view.fragments.BaseFragment;
 
 /**
@@ -62,7 +44,7 @@ import tutorial.lorence.template.view.fragments.BaseFragment;
  */
 
 @SuppressLint("ValidFragment")
-public class FragmentSchedule extends BaseFragment implements ScheduleView, SnackBarLayout.DialogInterface, HomeActivity.HomeInterface {
+public class FragmentContent extends BaseFragment implements ContentView, SnackBarLayout.DialogInterface, HomeActivity.HomeInterface {
 
     @Inject
     Context mContext;
@@ -80,10 +62,10 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     FragmentLoading mFragmentLoading;
 
     @Inject
-    SchedulePresenter mSchedulePresenter;
+    ContentPresenter mContentPresenter;
 
     @Inject
-    FragmentSchedule mFragmentSchedule;
+    FragmentContent mFragmentContent;
 
     @Inject
     Snackbar mSnackbar;
@@ -92,16 +74,11 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     SnackBarLayout mSnackBarLayout;
 
     @Inject
-    VGLoadingDialog loadingDialog;
-
-    @BindView(R.id.testImg)
-    ImageView testImg;
+    DialogLoading loadingDialog;
 
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private Disposable mDisposable;
-    private String mCurrentPhotoPath;
-    private Bitmap _descriptionBitmap;
 
     public void distributedDaggerComponents() {
         Application.getInstance()
@@ -112,7 +89,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     }
 
     @SuppressLint("ValidFragment")
-    public FragmentSchedule() {
+    public FragmentContent() {
     }
 
     @Override
@@ -133,7 +110,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     }
 
     private void showDialogProgress() {
-        mSchedulePresenter.getItems();
+        mContentPresenter.getItems();
         mFragmentManager = this.getChildFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.add(R.id.fragment_container, mFragmentLoading);
@@ -203,7 +180,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
             return;
         }
         if (Utils.checkPermissionCamera(mHomeActivity)) {
-            takePhotoByCamera();
+            // TODO
         } else {
             Utils.settingPermissionCameraOnFragment(this);
         }
@@ -227,105 +204,15 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
                         return;
                     }
                 }
-                takePhotoByCamera();
                 break;
         }
     }
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-            switch (requestCode) {
-                case Constants.REQUEST_CAMERA:
-                    final Uri[] tempUri = new Uri[1];
-                    Completable.fromAction(new Action() {
-                        @Override
-                        public void run() throws Exception {
-                            Bitmap bitmap = Utils.fixOrientationBugOfProcessedBitmap(mContext,
-                                    BitmapFactory.decodeFile(mCurrentPhotoPath), mCurrentPhotoPath);
-                            tempUri[0] = Utils.getImageUri(mContext, bitmap);
-                        }
-                    }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            if (tempUri[0] != null) {
-                                executeCroppedImage(mCurrentPhotoPath);
-                            } else {
-                                Toast.makeText(mContext, getString(R.string.message_wrong_image), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                        }
-                    });
-                    break;
-                case Constants.REQUEST_IMAGE_CROP:
-                    final Bitmap _bitmap = data.getParcelableExtra("Path_Cropper");
-                    if (_bitmap.getByteCount() <= 1920) {
-                        setImageProfile(_bitmap);
-                    } else {
-                        Completable.fromAction(new Action() {
-                            @Override
-                            public void run() throws Exception {
-                                _descriptionBitmap = Utils.resizeAndCompressImage(_bitmap);
-                            }
-                        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                if (_descriptionBitmap.getWidth() > 1024 || _descriptionBitmap.getHeight() > 1024) {
-                                    Toast.makeText(mContext, getString(R.string.error_selecting_file), Toast.LENGTH_SHORT).show();
-                                } else {
-                                    setImageProfile(_descriptionBitmap);
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                            }
-                        });
-                    }
-                    break;
-            }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void setImageProfile(final Bitmap bitmap) {
-        testImg.setImageDrawable(Utils.setRoundedBitmapImg(bitmap, mHomeActivity));
-    }
-
-    private void executeCroppedImage(final String currentPhotoPath) {
-        Intent intent = new Intent(mHomeActivity, CropImageActivity.class);
-        intent.putExtra("Path", currentPhotoPath);
-        this.startActivityForResult(intent, Constants.REQUEST_IMAGE_CROP);
-    }
-
-    private void takePhotoByCamera() {
-        if (mSnackbar.isShown()) mSnackbar.dismiss();
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photoFile = null;
-        try {
-            photoFile = Utils.createImageFile();
-            mCurrentPhotoPath = photoFile.getAbsolutePath();
-        } catch (IOException ex) {
-            // Error occurred while creating the File
-        }
-        // Continue only if the File was successfully created
-        if (photoFile != null) {
-            Uri photoURI = FileProvider.getUriForFile(mContext,
-                    BuildConfig.APPLICATION_ID + getString(R.string.fileprovider),
-                    photoFile);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-            startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
-        }
-    }
 
     @Override
     public void onBackPressOnFragment() {

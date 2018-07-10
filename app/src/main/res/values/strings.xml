@@ -2,20 +2,16 @@
     <string name="app_name">Vogo Image</string>
     <string name="no_internet_connection">No Internet Connection</string>
     <string name="error_time_out">Connection to server timed out. Please try again later.</string>
-    <string name="title_activity_splash">SplashActivity</string>
 
     <string name="tab_1">Crop Image</string>
     <string name="tab_2">Google Drive</string>
     <string name="tab_3">PDF Document</string>
     <string name="todo">TODO</string>
 
-    <string name="fileprovider">.fileprovider</string>
-    <string name="message_wrong_image">Something went wrong with the image, please try again!</string>
     <string name="error_permission">Permission is denied</string>
     <string name="dialog_pick">Effort Improve Android Skill</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
     <string name="btn_retry">Retry</string>
 
-    <string name="error_selecting_file">Error selecting file</string>
 </resources>

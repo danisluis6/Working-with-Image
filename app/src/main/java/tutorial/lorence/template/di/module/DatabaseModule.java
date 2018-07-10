@@ -12,8 +12,8 @@ import tutorial.lorence.template.other.GenerateWebsite;
 import tutorial.lorence.template.service.DisposableManager;
 import tutorial.lorence.template.view.activities.home.HomeModel;
 import tutorial.lorence.template.view.activities.home.HomeModelImpl;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.ScheduleModel;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.ScheduleModelImpl;
+import tutorial.lorence.template.view.activities.home.fragment.content.ContentModel;
+import tutorial.lorence.template.view.activities.home.fragment.content.ContentModelImpl;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -47,8 +47,8 @@ public class DatabaseModule {
 
     @Singleton
     @Provides
-    ScheduleModel provideScheduleModel(GenerateWebsite generateWebsite, DASchedule daSchedule) {
-        return new ScheduleModelImpl(mContext, generateWebsite, daSchedule);
+    ContentModel provideScheduleModel(GenerateWebsite generateWebsite, DASchedule daSchedule) {
+        return new ContentModelImpl(mContext, generateWebsite, daSchedule);
     }
 
     @Singleton

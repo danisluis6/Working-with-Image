@@ -1,4 +1,4 @@
-package tutorial.lorence.template.view.activities.home.fragment.schedule;
+package tutorial.lorence.template.view.activities.home.fragment.content;
 
 import android.content.Context;
 
@@ -29,25 +29,25 @@ import tutorial.lorence.template.view.activities.home.HomeActivity;
  * @version 0.0.1
  */
 
-public class ScheduleModelImpl implements ScheduleModel, IDisposableListener<Schedule> {
+public class ContentModelImpl implements ContentModel, IDisposableListener<Schedule> {
 
     private Context mContext;
     private HomeActivity mHomeActivity;
-    private SchedulePresenter mSchedulePresenter;
+    private ContentPresenter mContentPresenter;
     private DisposableManager mDisposableManager;
     private GenerateWebsite mGenerateWebsite;
-    private FragmentSchedule mFragmentSchedule;
+    private FragmentContent mFragmentContent;
     private DASchedule mDaoSchedule;
 
-    public ScheduleModelImpl(Context context, GenerateWebsite generateWebsite, DASchedule daoSchedule) {
+    public ContentModelImpl(Context context, GenerateWebsite generateWebsite, DASchedule daoSchedule) {
         mContext = context;
         mGenerateWebsite = generateWebsite;
         mDaoSchedule = daoSchedule;
     }
 
     @Override
-    public void attachFragment(FragmentSchedule fragmentSchedule) {
-        mFragmentSchedule = fragmentSchedule;
+    public void attachFragment(FragmentContent fragmentContent) {
+        mFragmentContent = fragmentContent;
     }
 
     @Override
@@ -56,8 +56,8 @@ public class ScheduleModelImpl implements ScheduleModel, IDisposableListener<Sch
     }
 
     @Override
-    public void attachPresenter(SchedulePresenter presenter) {
-        mSchedulePresenter = presenter;
+    public void attachPresenter(ContentPresenter presenter) {
+        mContentPresenter = presenter;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ScheduleModelImpl implements ScheduleModel, IDisposableListener<Sch
     @Override
     public void getItems(Constants.MVP mvp) {
         if (!Utils.isInternetOn(mContext)) {
-            mSchedulePresenter.setDisposable(mDisposableManager.callDisposable(Observable.just(mDaoSchedule.getAll(mContext))));
+            mContentPresenter.setDisposable(mDisposableManager.callDisposable(Observable.just(mDaoSchedule.getAll(mContext))));
         } else {
             if (mvp == Constants.MVP._JSOUP) {
                 new Thread(new Runnable() {
@@ -99,9 +99,9 @@ public class ScheduleModelImpl implements ScheduleModel, IDisposableListener<Sch
                                     mDaoSchedule.addAll(Utils.convertStringToObject(content, flag), mContext);
                                 }
                                 if (Utils.isInternetOn(mContext)) {
-                                    mSchedulePresenter.setDisposable(mDisposableManager.callDisposable(Observable.just(mDaoSchedule.getAll(mContext))));
+                                    mContentPresenter.setDisposable(mDisposableManager.callDisposable(Observable.just(mDaoSchedule.getAll(mContext))));
                                 } else {
-                                    mSchedulePresenter.onGetItemsFailure(mContext.getString(R.string.no_internet_connection));
+                                    mContentPresenter.onGetItemsFailure(mContext.getString(R.string.no_internet_connection));
                                 }
                             }
                         });
@@ -118,11 +118,11 @@ public class ScheduleModelImpl implements ScheduleModel, IDisposableListener<Sch
 
     @Override
     public void onHandleData(ArrayList<Schedule> items) {
-        mSchedulePresenter.onGetItemsSuccess(mDaoSchedule.getAll(mContext));
+        mContentPresenter.onGetItemsSuccess(mDaoSchedule.getAll(mContext));
     }
 
     @Override
     public void onApiFailure(Throwable error) {
-        mSchedulePresenter.onGetItemsFailure(mContext.getString(R.string.error_time_out));
+        mContentPresenter.onGetItemsFailure(mContext.getString(R.string.error_time_out));
     }
 }

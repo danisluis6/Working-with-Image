@@ -4,24 +4,19 @@ import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-import java.util.ArrayList;
-
 import dagger.Module;
 import dagger.Provides;
-import tutorial.lorence.template.data.storage.database.entities.recycler.Item;
 import tutorial.lorence.template.di.scope.ActivityScope;
 import tutorial.lorence.template.service.DisposableManager;
+import tutorial.lorence.template.service.JsonData;
+import tutorial.lorence.template.view.activities.home.HomeActivity;
 import tutorial.lorence.template.view.activities.home.HomeModel;
 import tutorial.lorence.template.view.activities.home.HomePresenter;
 import tutorial.lorence.template.view.activities.home.HomePresenterImpl;
 import tutorial.lorence.template.view.activities.home.HomeView;
-import tutorial.lorence.template.view.activities.home.adapter.UserAdapter;
-import tutorial.lorence.template.view.activities.home.adapter.ViewPaperAdapter;
-import tutorial.lorence.template.view.activities.home.adapter.ViewType;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
-import tutorial.lorence.template.service.JsonData;
-import tutorial.lorence.template.view.activities.home.HomeActivity;
-import tutorial.lorence.template.view.dialog.VGLoadingDialog;
+import tutorial.lorence.template.view.activities.home.adapter.PaperAdapter;
+import tutorial.lorence.template.view.activities.home.fragment.content.FragmentContent;
+import tutorial.lorence.template.view.dialog.DialogLoading;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -63,8 +58,8 @@ public class HomeModule {
 
     @Provides
     @ActivityScope
-    VGLoadingDialog provideVGLoadingDialog(HomeActivity homeActivity) {
-        return new VGLoadingDialog(homeActivity);
+    DialogLoading provideVGLoadingDialog(HomeActivity homeActivity) {
+        return new DialogLoading(homeActivity);
     }
 
     /**
@@ -85,26 +80,14 @@ public class HomeModule {
 
     @Provides
     @ActivityScope
-    ViewPaperAdapter provideViewPagerAdapter(Context context, FragmentManager fragmentManager, FragmentSchedule fragmentSchedule) {
-        return new ViewPaperAdapter(context, fragmentManager, fragmentSchedule);
+    PaperAdapter provideViewPagerAdapter(Context context, FragmentManager fragmentManager, FragmentContent fragmentContent) {
+        return new PaperAdapter(context, fragmentManager, fragmentContent);
     }
 
     @Provides
     @ActivityScope
-    ViewType provideViewType() {
-        return new ViewType();
-    }
-
-    @Provides
-    @ActivityScope
-    UserAdapter provideUserAdapter(Context context, ViewType viewType) {
-        return new UserAdapter(context, viewType, new ArrayList<Item>());
-    }
-
-    @Provides
-    @ActivityScope
-    FragmentSchedule provideFragmentRecycler() {
-        return new FragmentSchedule();
+    FragmentContent provideFragmentRecycler() {
+        return new FragmentContent();
     }
 
     @Provides

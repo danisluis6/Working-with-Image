@@ -14,7 +14,7 @@ import java.util.List;
 
 import tutorial.lorence.template.R;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
-import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
+import tutorial.lorence.template.view.activities.home.fragment.content.FragmentContent;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -27,7 +27,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MyView
 
     private Context mContext;
     private List<Schedule> mGroupSchedules;
-    private FragmentSchedule mFragment;
+    private FragmentContent mFragment;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -45,7 +45,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MyView
         }
     }
 
-    public ScheduleAdapter(Context context, FragmentSchedule fragment, List<Schedule> items) {
+    public ScheduleAdapter(Context context, FragmentContent fragment, List<Schedule> items) {
         mContext = context;
         mFragment = fragment;
         mGroupSchedules = items;
