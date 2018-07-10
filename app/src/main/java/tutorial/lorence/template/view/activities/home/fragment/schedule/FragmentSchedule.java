@@ -16,18 +16,20 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
@@ -49,6 +51,7 @@ import tutorial.lorence.template.view.activities.crop.CropImageActivity;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 import tutorial.lorence.template.view.activities.home.fragment.adapter.ScheduleAdapter;
 import tutorial.lorence.template.view.activities.home.loading.FragmentLoading;
+import tutorial.lorence.template.view.dialog.VGLoadingDialog;
 import tutorial.lorence.template.view.fragments.BaseFragment;
 
 /**
@@ -88,10 +91,17 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     @Inject
     SnackBarLayout mSnackBarLayout;
 
+    @Inject
+    VGLoadingDialog loadingDialog;
+
+    @BindView(R.id.testImg)
+    ImageView testImg;
+
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private Disposable mDisposable;
     private String mCurrentPhotoPath;
+    private Bitmap _descriptionBitmap;
 
     public void distributedDaggerComponents() {
         Application.getInstance()
@@ -224,75 +234,97 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case Constants.REQUEST_CAMERA:
-                    Bitmap bitmap = Utils.fixOrientationBugOfProcessedBitmap(mContext,
-                            BitmapFactory.decodeFile(mCurrentPhotoPath), mCurrentPhotoPath);
-                    Uri tempUri = Utils.getImageUri(mContext, bitmap);
-                    if (tempUri != null) {
-                        File newFile = new File(Utils.getRealPathFromURI(mHomeActivity, tempUri));
-                        executeCroppedImage(mCurrentPhotoPath);
-                    } else {
-                        Toast.makeText(mContext, getString(R.string.message_wrong_image), Toast.LENGTH_SHORT).show();
-                    }
+                    final Uri[] tempUri = new Uri[1];
+                    Completable.fromAction(new Action() {
+                        @Override
+                        public void run() throws Exception {
+                            Bitmap bitmap = Utils.fixOrientationBugOfProcessedBitmap(mContext,
+                                    BitmapFactory.decodeFile(mCurrentPhotoPath), mCurrentPhotoPath);
+                            tempUri[0] = Utils.getImageUri(mContext, bitmap);
+                        }
+                    }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            if (tempUri[0] != null) {
+                                executeCroppedImage(mCurrentPhotoPath);
+                            } else {
+                                Toast.makeText(mContext, getString(R.string.message_wrong_image), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                        }
+                    });
                     break;
                 case Constants.REQUEST_IMAGE_CROP:
-//                    Bitmap _bitmap = data.getParcelableExtra("Path");
-//                    setImageProfile(_bitmap);
-//                    if (_bitmap.getByteCount() <= 1920) {
-//                        setImageProfile(_bitmap);
-//                    } else {
-//                        new ExecuteSetProfileImgAsyncTask().execute(bitmap);
-//                    }
+                    final Bitmap _bitmap = data.getParcelableExtra("Path_Cropper");
+                    if (_bitmap.getByteCount() <= 1920) {
+                        setImageProfile(_bitmap);
+                    } else {
+                        Completable.fromAction(new Action() {
+                            @Override
+                            public void run() throws Exception {
+                                _descriptionBitmap = Utils.resizeAndCompressImage(_bitmap);
+                            }
+                        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                if (_descriptionBitmap.getWidth() > 1024 || _descriptionBitmap.getHeight() > 1024) {
+                                    Toast.makeText(mContext, getString(R.string.error_selecting_file), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    setImageProfile(_descriptionBitmap);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                            }
+                        });
+                    }
                     break;
             }
-        }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void setImageProfile(final Bitmap bitmap) {
+        testImg.setImageDrawable(Utils.setRoundedBitmapImg(bitmap, mHomeActivity));
     }
 
     private void executeCroppedImage(final String currentPhotoPath) {
         Intent intent = new Intent(mHomeActivity, CropImageActivity.class);
         intent.putExtra("Path", currentPhotoPath);
-        startActivityForResult(intent, Constants.REQUEST_IMAGE_CROP);
+        this.startActivityForResult(intent, Constants.REQUEST_IMAGE_CROP);
     }
 
     private void takePhotoByCamera() {
         if (mSnackbar.isShown()) mSnackbar.dismiss();
-                Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                File photoFile = null;
-                try {
-                    photoFile = Utils.createImageFile();
-                    mCurrentPhotoPath = photoFile.getAbsolutePath();
-                } catch (IOException ex) {
-                    // Error occurred while creating the File
-                }
-                // Continue only if the File was successfully created
-                if (photoFile != null) {
-                    Uri photoURI = FileProvider.getUriForFile(mContext,
-                            BuildConfig.APPLICATION_ID + getString(R.string.fileprovider),
-                            photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
-                }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
-            @Override
-            public void onSubscribe(Disposable d) {
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-        });
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = null;
+        try {
+            photoFile = Utils.createImageFile();
+            mCurrentPhotoPath = photoFile.getAbsolutePath();
+        } catch (IOException ex) {
+            // Error occurred while creating the File
+        }
+        // Continue only if the File was successfully created
+        if (photoFile != null) {
+            Uri photoURI = FileProvider.getUriForFile(mContext,
+                    BuildConfig.APPLICATION_ID + getString(R.string.fileprovider),
+                    photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
+        }
     }
 
     @Override

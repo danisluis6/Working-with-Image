@@ -1,6 +1,7 @@
 package tutorial.lorence.template.view.activities.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -139,6 +140,11 @@ public class HomeActivity extends BaseActivity implements HomeView {
             return mContext.getResources().getString(R.string.tab_3);
         }
         return Constants.EMPTY_STRING;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

@@ -21,6 +21,7 @@ import tutorial.lorence.template.view.activities.home.adapter.ViewType;
 import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
 import tutorial.lorence.template.service.JsonData;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
+import tutorial.lorence.template.view.dialog.VGLoadingDialog;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -58,6 +59,12 @@ public class HomeModule {
     @ActivityScope
     JsonData provideJsonData(Context context) {
         return new JsonData(context);
+    }
+
+    @Provides
+    @ActivityScope
+    VGLoadingDialog provideVGLoadingDialog(HomeActivity homeActivity) {
+        return new VGLoadingDialog(homeActivity);
     }
 
     /**

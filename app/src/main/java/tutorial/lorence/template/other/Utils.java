@@ -15,9 +15,12 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
+import tutorial.lorence.template.view.activities.crop.Dimension;
 import tutorial.lorence.template.view.activities.home.fragment.schedule.FragmentSchedule;
 
 /**
@@ -55,6 +59,13 @@ public class Utils {
         }
         sLastClickTime = clickTime;
         return false;
+    }
+
+    public static RoundedBitmapDrawable setRoundedBitmapImg(Bitmap bitmap, Context context) {
+        RoundedBitmapDrawable drawable = RoundedBitmapDrawableFactory.create(context.getResources(),
+                Bitmap.createScaledBitmap(bitmap, Dimension.convertDptoPx(150, context), Dimension.convertDptoPx(150, context), false));
+        drawable.setCircular(true);
+        return drawable;
     }
 
     public static boolean isInternetOn(Context context) {
@@ -336,6 +347,19 @@ public class Utils {
             }
         }
         return fileOrDirectory.delete();
+    }
+
+    public static Bitmap resizeAndCompressImage(Bitmap bmpPic) {
+        int compressQuality = 100; // quality decreasing by 5 every loop.
+        int streamLength;
+        do {
+            ByteArrayOutputStream bmpStream = new ByteArrayOutputStream();
+            bmpPic.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream);
+            byte[] bmpPicByteArray = bmpStream.toByteArray();
+            streamLength = bmpPicByteArray.length;
+            compressQuality -= 5;
+        } while (streamLength >= 20*1024);
+        return bmpPic;
     }
 
 }

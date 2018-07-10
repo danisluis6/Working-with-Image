@@ -16,4 +16,6 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
     <string name="btn_retry">Retry</string>
+
+    <string name="error_selecting_file">Error selecting file</string>
 </resources>

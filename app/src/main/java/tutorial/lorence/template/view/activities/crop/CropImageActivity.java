@@ -9,12 +9,10 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.File;
@@ -22,14 +20,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import io.reactivex.Completable;
-import io.reactivex.CompletableObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.schedulers.Schedulers;
 import tutorial.lorence.template.R;
-import tutorial.lorence.template.custom.EzFaxingLayout;
+import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.other.Utils;
 
 public class CropImageActivity extends Activity implements View.OnClickListener {
@@ -37,9 +29,6 @@ public class CropImageActivity extends Activity implements View.OnClickListener 
     private String mImagePath;
     private Button btnCancle, btnCrop;
     private ContentResolver mContentResolver;
-
-    private EzFaxingLayout layoutRetry;
-    private FrameLayout layoutMain;
 
     private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -66,8 +55,6 @@ public class CropImageActivity extends Activity implements View.OnClickListener 
         // Get screen dimensions in pixels
         ViewGroup viewGroup = findViewById(R.id.activity_image_cropper);
         View parent = getLayoutInflater().inflate(R.layout.activity_image_cropper, viewGroup);
-        layoutRetry = parent.findViewById(R.id.layoutRetry);
-        layoutMain = parent.findViewById(R.id.layoutMain);
         initViews(parent);
         initAttributes();
         initListeners();
@@ -143,8 +130,8 @@ public class CropImageActivity extends Activity implements View.OnClickListener 
         Bitmap bitmap = saveOutput();
         if (bitmap != null) {
             Intent intent = new Intent();
-            intent.putExtra("Path", bitmap);
-            setResult(RESULT_OK, intent);
+            intent.putExtra("Path_Cropper", bitmap);
+            setResult(Constants.REQUEST_IMAGE_CROP, intent);
             finish();
         } else {
             Toast.makeText(this, "Unable to save Image into your device.", Toast.LENGTH_LONG).show();
@@ -195,22 +182,4 @@ public class CropImageActivity extends Activity implements View.OnClickListener 
         zoomView.draw(c);
         return result;
     }
-
-    private void handleMessage(String _case, String message) {
-        if (TextUtils.isEmpty(_case) || TextUtils.isEmpty(message)) {
-            layoutMain.setVisibility(View.VISIBLE);
-            layoutRetry.setVisibility(View.GONE);
-            return;
-        }
-        layoutRetry.setVisibility(View.VISIBLE);
-        layoutRetry.setupMessageDisplay(message);
-        layoutRetry.setListenerRetry(new EzFaxingLayout.OnRetryListener() {
-            @Override
-            public void onRetry() {
-                // TODO
-            }
-        });
-    }
-
-
 }
