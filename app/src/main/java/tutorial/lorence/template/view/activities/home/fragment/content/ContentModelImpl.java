@@ -1,6 +1,7 @@
 package tutorial.lorence.template.view.activities.home.fragment.content;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -67,48 +68,58 @@ public class ContentModelImpl implements ContentModel, IDisposableListener<Sched
     }
 
     @Override
-    public void getItems(Constants.MVP mvp) {
+    public void getItems(final String word) {
         if (!Utils.isInternetOn(mContext)) {
             mContentPresenter.setDisposable(mDisposableManager.callDisposable(Observable.just(mDaoSchedule.getAll(mContext))));
         } else {
-            if (mvp == Constants.MVP._JSOUP) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final List<String> content = new ArrayList<>();
-                        final List<String> flag = new ArrayList<>();
-                        try {
-                            Document doc = Jsoup.connect(mGenerateWebsite.jsoup_URL()).get();
-                            Elements trs = doc.getElementsByClass("ltd-tr2");
-                            for (Element tr : trs) {
-                                content.add(tr.text());
-                            }
-
-                            Elements arrImage = doc.select("img");
-                            for (Element img : arrImage) {
-                                flag.add(img.absUrl("src"));
-                            }
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final List<String> _spellingcontent = new ArrayList<>();
+                    final List<String> _audiospellingcontent = new ArrayList<>();
+                    final List<String> _definitionByEn = new ArrayList<>();
+                    try {
+                        String Uri = new StringBuilder(Constants.EMPTY_STRING)
+                                .append(Constants.URL_SITE)
+                                .append(word)
+                                .append(Constants.REGEX)
+                                .append(word)
+                                .toString();
+                        Document doc = Jsoup.connect(Uri).get();
+                        Elements trs = doc.getElementsByClass("pron-gs ei-g");
+                        for (Element tr : trs) {
+                            _spellingcontent.add(tr.text());
                         }
-                        mHomeActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mDaoSchedule.getAll(mContext).size() == 0) {
-                                    mDaoSchedule.addAll(Utils.convertStringToObject(content, flag), mContext);
-                                }
-                                if (Utils.isInternetOn(mContext)) {
-                                    mContentPresenter.setDisposable(mDisposableManager.callDisposable(Observable.just(mDaoSchedule.getAll(mContext))));
-                                } else {
-                                    mContentPresenter.onGetItemsFailure(mContext.getString(R.string.no_internet_connection));
-                                }
-                            }
-                        });
-                    }
+                        Elements trs1 = doc.getElementsByClass("sound audio_play_button pron-uk icon-audio");
+                        _audiospellingcontent.add(trs1.attr("data-src-mp3"));
 
-                }).start();
-            }
+                        Elements trs2 = doc.getElementsByClass("def");
+                        for (Element tr : trs2) {
+                            _definitionByEn.add(tr.text());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    mHomeActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String pronouceByBre = Utils.getPronouceByBre(_spellingcontent);
+                            String pronouceByNAmE = Utils.getPronouceByNAmE(_spellingcontent);
+                            String audio = _audiospellingcontent.get(0);
+                            Log.i("TAG", "N = "+_definitionByEn.size());
+//                                if (mDaoSchedule.getAll(mContext).size() == 0) {
+//                                    mDaoSchedule.addAll(Utils.convertStringToObject(content, flag), mContext);
+//                                }
+//                                if (Utils.isInternetOn(mContext)) {
+//                                    mContentPresenter.setDisposable(mDisposableManager.callDisposable(Observable.just(mDaoSchedule.getAll(mContext))));
+//                                } else {
+//                                    mContentPresenter.onGetItemsFailure(mContext.getString(R.string.no_internet_connection));
+//                                }
+                        }
+                    });
+                }
+
+            }).start();
         }
     }
 

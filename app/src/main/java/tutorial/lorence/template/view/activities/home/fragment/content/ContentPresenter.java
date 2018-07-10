@@ -13,7 +13,7 @@ import tutorial.lorence.template.data.storage.database.entities.Schedule;
  */
 
 public interface ContentPresenter {
-    void getItems();
+    void getItems(String word);
 
     void setDisposable(Disposable disposable);
 

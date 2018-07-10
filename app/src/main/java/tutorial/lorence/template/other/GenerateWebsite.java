@@ -19,6 +19,6 @@ public class GenerateWebsite {
      * URL for jsoup
      */
     public String jsoup_URL() {
-        return "https://bongda24h.vn/vck-world-cup-2018/lich-thi-dau-41.html";
+        return "https://www.oxfordlearnersdictionaries.com/definition/english/hello_1?q=hello";
     }
 }

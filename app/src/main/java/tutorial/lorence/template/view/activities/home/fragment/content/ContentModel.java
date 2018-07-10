@@ -1,6 +1,5 @@
 package tutorial.lorence.template.view.activities.home.fragment.content;
 
-import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.service.DisposableManager;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 
@@ -12,9 +11,9 @@ import tutorial.lorence.template.view.activities.home.HomeActivity;
  */
 
 public interface ContentModel {
-    void getItems(Constants.MVP mvp);
     void attachPresenter(ContentPresenter presenter);
     void attachDisposable(DisposableManager disposableManager);
     void attachFragment(FragmentContent fragmentContent);
     void attachActivity(HomeActivity mHomeActivity);
+    void getItems(String word);
 }

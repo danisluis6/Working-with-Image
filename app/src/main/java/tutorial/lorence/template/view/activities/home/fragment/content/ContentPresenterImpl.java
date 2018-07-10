@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import io.reactivex.disposables.Disposable;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
-import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.service.DisposableManager;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 
@@ -38,8 +37,8 @@ public class ContentPresenterImpl implements ContentPresenter {
     }
 
     @Override
-    public void getItems() {
-        mContentModel.getItems(Constants.MVP._JSOUP);
+    public void getItems(String word) {
+        mContentModel.getItems(word);
     }
 
     @Override

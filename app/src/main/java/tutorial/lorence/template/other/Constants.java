@@ -19,7 +19,9 @@ public class Constants {
 
     public final static int PERMISSION_CAMERA = 0;
 
-    public final static int REQUEST_IMAGE_CROP = 2;
+    public final static String URL_SITE = "https://www.oxfordlearnersdictionaries.com/definition/english/";
+
+    public final static String REGEX = "_1?q=";
 
     private Constants() {
     }

@@ -110,7 +110,7 @@ public class FragmentContent extends BaseFragment implements ContentView, SnackB
     }
 
     private void showDialogProgress() {
-        mContentPresenter.getItems();
+        mContentPresenter.getItems("hello");
         mFragmentManager = this.getChildFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.add(R.id.fragment_container, mFragmentLoading);
