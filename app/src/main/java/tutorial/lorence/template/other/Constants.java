@@ -18,7 +18,10 @@ public class Constants {
     static int DOUBLE_CLICK_TIME_DELTA = 500;
 
     public final static int PERMISSION_CAMERA = 0;
-    public final static int REQUEST_CAMERA = 1;
+    public final static int PERMISSION_GALLERY = 1;
+    public final static int PERMISSION_STORAGE = 1;
+
+    public final static int REQUEST_STORAGE = 0;
 
     private Constants() {
     }
@@ -26,6 +29,4 @@ public class Constants {
     public enum MVP {
         _JSOUP, _JSON, _SQL
     }
-
-    static final String IMAGE_FOLDER = "Vogo";
 }

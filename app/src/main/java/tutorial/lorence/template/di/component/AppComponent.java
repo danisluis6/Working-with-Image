@@ -6,9 +6,10 @@ import dagger.Component;
 import tutorial.lorence.template.di.module.AppModule;
 import tutorial.lorence.template.di.module.AsyntaskModule;
 import tutorial.lorence.template.di.module.DatabaseModule;
+import tutorial.lorence.template.di.module.HomeModule;
 import tutorial.lorence.template.di.module.JsoupModule;
 import tutorial.lorence.template.di.module.LoadingModule;
-import tutorial.lorence.template.di.module.HomeModule;
+import tutorial.lorence.template.di.module.StorageModule;
 
 /**
  * Created by vuongluis on 4/14/2018.
@@ -24,5 +25,6 @@ import tutorial.lorence.template.di.module.HomeModule;
         }
 )
 public interface AppComponent {
-        HomeComponent plus(HomeModule module);
+    HomeComponent plus(HomeModule module);
+    StorageComponent plus(StorageModule module);
 }

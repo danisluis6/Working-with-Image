@@ -9,13 +9,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,22 +22,22 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 
 import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
-import tutorial.lorence.template.BuildConfig;
 import tutorial.lorence.template.R;
 import tutorial.lorence.template.app.Application;
 import tutorial.lorence.template.custom.SnackBarLayout;
+import tutorial.lorence.template.data.storage.database.entities.Folder;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
 import tutorial.lorence.template.di.module.HomeModule;
 import tutorial.lorence.template.di.module.ScheduleModule;
 import tutorial.lorence.template.other.Constants;
 import tutorial.lorence.template.other.Utils;
+import tutorial.lorence.template.other.storage.StorageActivity;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
 import tutorial.lorence.template.view.activities.home.HomeActivity;
 import tutorial.lorence.template.view.activities.home.fragment.adapter.ScheduleAdapter;
@@ -85,13 +84,14 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private Disposable mDisposable;
-    private String mCurrentPhotoPath;
+
+    private ArrayList<Folder> arrFolder;
 
     public void distributedDaggerComponents() {
         Application.getInstance()
                 .getAppComponent()
                 .plus(new HomeModule((HomeActivity) getActivity()))
-                .plus(new ScheduleModule((HomeActivity) getActivity() ,this, this))
+                .plus(new ScheduleModule((HomeActivity) getActivity(), this, this))
                 .inject(this);
     }
 
@@ -129,11 +129,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     public void initComponents() {
         mSnackBarLayout.attachDialogInterface(this);
         mHomeActivity.attachHomeInterface(this);
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+        arrFolder = new ArrayList<>();
     }
 
     @Override
@@ -161,7 +157,7 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     }
 
     @OnClick({R.id.fragment_container})
-    void onClick (View v) {
+    void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_container:
                 if (mSnackbar.isShown())
@@ -181,79 +177,44 @@ public class FragmentSchedule extends BaseFragment implements ScheduleView, Snac
     }
 
     @Override
-    public void openCamera() {
-        if (Utils.isDoubleClick()) {
-            return;
-        }
-        if (Utils.checkPermissionCamera(mHomeActivity)) {
-            takePhotoByCamera();
-        } else {
-            Utils.settingPermissionCameraOnFragment(this);
-        }
-    }
-
-    @Override
-    public void openGallery() {
-    }
-
-    @Override
     public void openStorage() {
+        if (Utils.checkPermissionReadExternalStorage(mHomeActivity)) {
+            Utils.settingPermissionReadExternalOnFragment(this);
+        } else {
+            startAccessStorage();
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case Constants.PERMISSION_CAMERA:
-                for (int permissionId : grantResults) {
-                    if (permissionId != PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(mContext, getString(R.string.error_permission), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+            case Constants.PERMISSION_STORAGE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startAccessStorage();
+                } else {
+                    Toast.makeText(mContext, getString(R.string.error_permission), Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                takePhotoByCamera();
                 break;
         }
     }
 
-    @Override
-    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
-            switch (requestCode) {
-                case Constants.REQUEST_CAMERA:
-                    Bitmap bitmap = Utils.fixOrientationBugOfProcessedBitmap(mContext,
-                            BitmapFactory.decodeFile(mCurrentPhotoPath), mCurrentPhotoPath);
-                    Uri tempUri = Utils.getImageUri(mContext, bitmap);
-                    if (tempUri != null) {
-                        File newFile = new File(Utils.getRealPathFromURI(mHomeActivity, tempUri));
-                        Log.i("TAG", "File name: "+newFile.getName());
-                        Log.i("TAG", "File size: "+newFile.length());
-                    } else {
-                        Toast.makeText(mContext, getString(R.string.message_wrong_image), Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+    private void startAccessStorage() {
+        File root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+        extractSubFolder(root);
     }
 
-    private void takePhotoByCamera() {
-        if (mSnackbar.isShown()) mSnackbar.dismiss();
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photoFile = null;
-        try {
-            photoFile = Utils.createImageFile();
-            mCurrentPhotoPath = photoFile.getAbsolutePath();
-        } catch (IOException ex) {
-            // Error occurred while creating the File
+    private void extractSubFolder(File root) {
+        File[] files = root.listFiles();
+        arrFolder.clear();
+        for (File f : files) {
+            arrFolder.add(new Folder(R.drawable.ic_folder, f.getName(), (f.isDirectory() ? "Directory" : "File"), f.getAbsolutePath()));
         }
-        // Continue only if the File was successfully created
-        if (photoFile != null) {
-            Uri photoURI = FileProvider.getUriForFile(mContext,
-                    BuildConfig.APPLICATION_ID + getString(R.string.fileprovider),
-                    photoFile);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-            startActivityForResult(takePictureIntent, Constants.REQUEST_CAMERA);
-        }
+        Intent intent = new Intent(mHomeActivity, StorageActivity.class);
+        intent.putParcelableArrayListExtra("arrFolder", arrFolder);
+        mHomeActivity.startActivityForResult(intent, Constants.REQUEST_STORAGE);
+        if (mSnackbar.isShown())
+            mSnackbar.dismiss();
     }
 
     @Override

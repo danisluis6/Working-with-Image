@@ -1,14 +1,16 @@
 package tutorial.lorence.template.view.activities.home;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -24,7 +26,6 @@ import tutorial.lorence.template.app.Application;
 import tutorial.lorence.template.data.storage.database.entities.Schedule;
 import tutorial.lorence.template.di.module.HomeModule;
 import tutorial.lorence.template.other.Constants;
-import tutorial.lorence.template.other.Utils;
 import tutorial.lorence.template.service.JsonData;
 import tutorial.lorence.template.service.asyntask.DownloadImage;
 import tutorial.lorence.template.view.activities.BaseActivity;
@@ -127,7 +128,6 @@ public class HomeActivity extends BaseActivity implements HomeView {
                         }
                     }));
         }
-        Utils.deleteImageFolder(this);
     }
 
     private String getTabTitle(int index) {
@@ -153,6 +153,19 @@ public class HomeActivity extends BaseActivity implements HomeView {
     @Override
     public void onGetItemsFailure(String message) {
 
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case Constants.REQUEST_STORAGE:
+                    String mCurrentPath = data.getStringExtra("Path");
+                    Toast.makeText(mContext, mCurrentPath, Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
